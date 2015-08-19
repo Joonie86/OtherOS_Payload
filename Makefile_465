@@ -1,0 +1,28 @@
+CC		:= ppu-gcc
+LIBSDIR         =
+LIBS            =
+TARGET		= otheros_payload_465
+
+
+CFLAGS = -ffunction-sections -fdata-sections -Os -m64 -fno-builtin -fno-exceptions \
+			   -Os -Wall $(foreach dir,$(INCLUDE),-I$(dir)) -ffreestanding 
+CFLAGS += --std=gnu99
+LDFLAGS=-nostartfiles -nostdlib -mbig-endian
+LDFLAGS= -nostdlib -nodefaultlibs -Wl,-static -Wl,-s -L. $(foreach dir,$(LIBSDIR),-L$(dir)) $(LIBS) -Wl,--gc-sections 
+
+OBJS = otheros_payload_465.o
+
+all: $(TARGET).bin
+
+%.bin: %.elf
+	
+	
+$(TARGET).elf: $(OBJS) 
+	ppu-objcopy -O binary otheros_payload_465.o otheros_payload_465.bin
+	rm -f *.o
+
+%.o: %.S
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f *.o *.bin 
